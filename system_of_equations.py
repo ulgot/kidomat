@@ -139,13 +139,22 @@ def latexify(eqs):
 
 
 def get_latex_doc(eqs):
-    "Returns string of equations formatted as latex"
+    """
+    Returns string of equations formatted as latex.
+    Automatically calculates no of columns (1 or 2) in latex file.
+    """
+
+    number_of_variables = len(eqs[0].split('\n'))
+    maks_number_of_variables = 5
+
     ret = add_latex_line(r'\documentclass[12pt, a4paper]{article}')
     ret += add_latex_line(r'\usepackage[margin=0.5in]{geometry}')
     ret += add_latex_line(r'\usepackage[fleqn]{amsmath}')
     ret += add_latex_line(r'\usepackage{multicol}')
     ret += add_latex_line(r'\begin{document}')
-    ret += add_latex_line(r'\begin{multicols}{2}')
+
+    if number_of_variables <= maks_number_of_variables:
+        ret += add_latex_line(r'\begin{multicols}{2}')
 
     for txt in eqs:
         ret += add_latex_line(r'\begin{equation}', indent=2)
@@ -157,7 +166,9 @@ def get_latex_doc(eqs):
         ret += add_latex_line(r'\end{equation}', indent=2)
         ret += add_latex_line(r' ', indent=2)
 
-    ret += add_latex_line(r'\end{multicols}')
+    if number_of_variables <= maks_number_of_variables:
+        ret += add_latex_line(r'\end{multicols}')
+
     ret += add_latex_line(r'\end{document}')
 
     return ret

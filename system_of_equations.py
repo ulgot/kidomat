@@ -131,11 +131,13 @@ def add_latex_line(txt, indent=0):
 def latexify(eqs):
     "Generate PDF from latex"
     import subprocess
-    latex = get_latex_doc(eqs)
-    with open('out.tex', 'w') as f:
-        f.write(latex)
-    subprocess.run(["pdflatex", "out.tex"])
-    subprocess.run(["rm", "out.log", "out.aux", "out.tex"])
+
+    outf = 'equations'
+    with open(outf + '.tex', 'w') as f:
+        f.write(get_latex_doc(eqs))
+
+    subprocess.run(["pdflatex", outf + ".tex"])
+    subprocess.run(["rm", outf + ".log", outf + ".aux", outf + ".tex"])
 
 
 def get_latex_doc(eqs):

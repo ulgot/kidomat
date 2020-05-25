@@ -180,10 +180,25 @@ def get_system_of_equations(N=1, n=1, level=1, latex=True):
 
     Parameters
     ----------
-    N : int
-    n : int
+    n : int or dict or list or tuple
+        number of variables or equations to solve
+
     level : int
+        difficulty of problem to solve
+        1 or 'babe' - lowest, values between 0 and 9
+        2 or 'kido' - positive values between 0 and 20
+        3 or 'novice' - values between -20 and 20
+        4 or 'pupil' - values between -100 and 100
+        5 or 'smart' - values between -200 and 200
+        6 or 'smartass' - possible fractions as answer
+
+    N : int
+        number of systems of equations to solve
+
     latex : bool
+        whether produce PDF over latex or leave ascii form
+        True : (defult) produces PDF
+        False : produces ascii form
 
     Returns
     -------

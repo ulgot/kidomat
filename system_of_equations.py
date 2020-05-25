@@ -60,7 +60,7 @@ def get_variables(n=1, level=1):
         a, b = -200, 200
         name_start = random.randint(0, 25)
 
-    # naming convention
+    # variables naming convention
     alphabet = string.ascii_lowercase
     variable_names = alphabet[name_start:] + alphabet[:name_start]
 
@@ -76,8 +76,9 @@ def get_variables(n=1, level=1):
 
 
 def add_coefficient(c):
-    if c == 1:
-        return ''
+    """
+    Simple function for converting coefficient into string
+    """
     if c < 0:
         return f'- {abs(c)}'
     elif c > 0:
@@ -86,13 +87,33 @@ def add_coefficient(c):
         return ''
 
 
-def add_element(c, v, elem, lhs):
+def add_element(c, v, lhs):
+    '''
+    Converts coefficient and variable into an element of the
+    left hand side for equation.
+
+    Parameters
+    ----------
+    c : int
+        coefficient
+    v : str
+        variable in equation
+    lhs : str
+        temporary lhs for equation
+
+    Returns
+    -------
+    str : nicely formatted element of equation (c * v)
+    '''
     c = add_coefficient(c)
 
     if c == '':
         return ''
+    else:
+        if c[-2:] == ' 1':
+            c = c[:-1]
+        ret = c + v
 
-    ret = c + v
     if lhs == '':
         if ret[0] == '+':
             ret = ret[2:]
@@ -103,10 +124,12 @@ def add_element(c, v, elem, lhs):
 
 
 def add_latex_line(txt, indent=0):
+    "help function for latex output"
     return ' ' * 2 * indent + txt + '\n'
 
 
 def latexify(eqs):
+    "Generate PDF from latex"
     import subprocess
     latex = get_latex_doc(eqs)
     with open('out.tex', 'w') as f:
@@ -116,6 +139,7 @@ def latexify(eqs):
 
 
 def get_latex_doc(eqs):
+    "Returns string of equations formatted as latex"
     ret = add_latex_line(r'\documentclass[12pt, a4paper]{article}')
     ret += add_latex_line(r'\usepackage[margin=0.5in]{geometry}')
     ret += add_latex_line(r'\usepackage[fleqn]{amsmath}')
@@ -140,7 +164,20 @@ def get_latex_doc(eqs):
 
 
 def get_system_of_equations(N=1, n=1, level=1, latex=True):
-    "..."
+    """
+    Produces system of equations.
+
+    Parameters
+    ----------
+    N : int
+    n : int
+    level : int
+    latex : bool
+
+    Returns
+    -------
+    str : N systems of n equations with n variables
+    """
 
     rets = []
     for eq in range(N):
@@ -155,7 +192,7 @@ def get_system_of_equations(N=1, n=1, level=1, latex=True):
                 c = d['coefficients'][elem + z * n]
                 v = d['variables'][elem]
 
-                element = add_element(c, v, elem, lhs)
+                element = add_element(c, v, lhs)
                 lhs += element
                 rhs += c * d[v]
 

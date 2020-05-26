@@ -27,6 +27,7 @@ def get_variables(n=1, level=1):
         values: values of variables
 
     TODO: 1. smartass
+          2. coefficients also on rhs of eqs from level 3 up
     '''
     assert isinstance(n, int) and n > 0, "n is a positive int"
 
@@ -71,6 +72,8 @@ def get_variables(n=1, level=1):
         ret[variable_names[i]] = random.randint(a, b)
 
     ret['coefficients'] = [random.randint(a, b) for i in range(n * n)]
+    # ret['lhs'] = ret['coefficients']
+    # ret['rhs'] = [random.randint(a, b) for i in range(n * n)]
 
     return ret
 
@@ -128,11 +131,10 @@ def add_latex_line(txt, indent=0):
     return ' ' * 2 * indent + txt + '\n'
 
 
-def latexify(eqs):
+def latexify(eqs, outf='equations'):
     "Generate PDF from latex"
     import subprocess
 
-    outf = 'equations'
     with open(outf + '.tex', 'w') as f:
         f.write(get_latex_doc(eqs))
 
@@ -159,6 +161,7 @@ def get_latex_doc(eqs):
         ret += add_latex_line(r'\begin{multicols}{2}')
 
     for txt in eqs:
+        # ret += add_latex_line(rf'Problem {eqs.index(txt) + 1}\\', indent=2)
         ret += add_latex_line(r'\begin{equation}', indent=2)
         ret += add_latex_line(r'\begin{cases}', indent=3)
         for line in txt.split('\n'):
@@ -207,15 +210,18 @@ def get_system_of_equations(N=1, n=1, level=1, latex=True):
     str : N systems of n equations with n variables
     """
 
-    rets = []
+    eqs = []
+    answers = []
     for eq in range(N):
         d = get_variables(n, level)
 
-        ret = ''
+        eq = ''
+        ans = ''
         for z in range(n):
 
             rhs = 0
             lhs = ''
+            vars = {}
             for elem in range(n):
                 c = d['coefficients'][elem + z * n]
                 v = d['variables'][elem]
@@ -224,20 +230,37 @@ def get_system_of_equations(N=1, n=1, level=1, latex=True):
                 lhs += element
                 rhs += c * d[v]
 
-            ret += f'{lhs} = {rhs}'
+            # answers
+            _var = d['variables'][z]
+            ans += f'{_var} = {d[_var]}'
+
+            # equations
+            eq += f'{lhs} = {rhs}'
+
+            # linebrak after each eq, except the last
             if z < n - 1:
-                ret += '\n'
-        rets.append(ret)
+                ans += '\n'
+                eq += '\n'
+
+        eqs.append(eq)
+        answers.append(ans)
 
     if latex:
-        rets = latexify(rets)
+        latexify(eqs)
+        latexify(answers, "answers")
 
-    return rets
+    return {'equations': eqs, 'answers': answers}
 
 
 if __name__ == "__main__":
-    N = int(sys.argv[1])
-    n = int(sys.argv[2])
-    level = sys.argv[3]
+    # TODO: rewrite with argpasser
+    N = int(sys.argv[1])  # no or equations
+    n = int(sys.argv[2])  # no of variables
+    level = sys.argv[3]  # level of difficulty
+
     t = get_system_of_equations(N, n, level)
-    print(t)
+
+    for a, b in t.items():
+        print(a)
+        for el in b:
+            print(f'({b.index(el) + 1})\n{el}', end='\n\n')
